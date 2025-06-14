@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from enum import Enum
 from src.recommend import Recommend
 import requests
 import os
@@ -22,7 +21,7 @@ app = FastAPI(lifespan=lifespan)
 
 origins = [
     "https://anirec-woad.vercel.app"
-]
+ ]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -33,7 +32,7 @@ app.add_middleware(
 @app.get('/')
 async def root():
     return {"message": "Hello World"}
-   
+
 @app.get("/categories/anime/{anime_name}")
 async def get_rec_anime(anime_name: str):
     return {'data': app.state.rec.get_rec_anime(anime_name)}

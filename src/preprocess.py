@@ -16,19 +16,11 @@ class DataFrames:
         self.engine = create_engine(os.getenv("SQL_ALCHEMY_CRED"))
         self.anime_df = pd.read_sql("select * from animes", con=self.engine)
 
-        self.ratings = pd.read_sql("select * from ratings", con=self.engine)
-        # self.ratings = pd.read_sql("WITH a AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY anime_id) AS rank FROM ratings)SELECT * FROM a WHERE rank < 1000", con=self.engine)
-      
         # Scores only go from [-1, 10]
         self.anime_df['score'] = self.anime_df['score'].astype('float16')
         # Anime_id goes from [1, 55647]
         self.anime_df['anime_id'] = self.anime_df['anime_id'].astype('int32')
 
-    # Ratings go from [-1, 10]
-        self.ratings['rating'] = self.ratings['rating'].astype('int8')
-
-    # User id goes from [1, 1291097]
-        self.ratings['user_id'] = self.ratings['user_id'].astype('int32')
         self.anime_df['genres'] = self.anime_df['genres'].str.replace(',', '')
         self.anime_df['genres'] = self.anime_df['genres'].str.replace('-','_')
         self.anime_df['genres'] = self.anime_df['genres'].str.replace('(','')
@@ -39,15 +31,8 @@ class DataFrames:
         cosine_sim_genres = cosine_similarity(tfidf_matrix,tfidf_matrix)
         self.cosine_sim_df = pd.DataFrame(cosine_sim_genres, index = self.anime_df['anime_id'], columns = self.anime_df['anime_id'])
 
-        
-        user_ratings = self.ratings.pivot_table(index = ['user_id'], columns=['anime_id'], values = 'rating')
-     
-        user_ratings = user_ratings.dropna(thresh = 300, axis = 1).fillna(0) # remove anime who have less than 300 ratings
-       
-        user_ratings = user_ratings.apply(lambda ratings: ratings - ratings.mean(), axis=1)
-        
-        item_similarity = cosine_similarity(user_ratings.T)
-        self.item_similarity_df = pd.DataFrame(item_similarity, index = user_ratings.columns, columns = user_ratings.columns)
+        self.item_similarity_df = pd.read_csv("Data.csv", index_col=0) ## Cosine similarities between each anime.
+        print(self.item_similarity_df)
     
     def getUserData(self, userlist, allAnimes):
         '''

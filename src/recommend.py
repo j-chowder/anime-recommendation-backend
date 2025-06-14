@@ -17,7 +17,8 @@ class Recommend(DataFrames):
         if(id == -1): 
             return {'contains': self.search.sort_scores(self.search.get_similar_names(name, 'name')), 'fuzzy': self.search.get_fuzz_names(name)}
 
-        s = self.item_similarity_df[id]
+        s = self.item_similarity_df[str(id)]
+        print(s)
         s = s.sort_values(ascending=False).iloc[1:100] # top 100 (skipping itself)
         mapped_values = {}
         for i, values in s.items():
@@ -106,7 +107,8 @@ class Recommend(DataFrames):
         '''
         similar= pd.Series([])
         for i, id in enumerate(topAnimes):
-            s: pd.Series = self.item_similarity_df[id]
+            s: pd.Series = self.item_similarity_df[str(id)]
+            print(s)
             s = s.sort_values(ascending=False)
             s = s.apply(lambda x: x + np.log(1 + weights[i]))
             similar = pd.concat([similar, s])
