@@ -20,7 +20,8 @@ app = FastAPI(lifespan=lifespan)
 
 
 origins = [
-    "https://anirec-woad.vercel.app"
+    "https://anirec-woad.vercel.app",
+    "https://script.google.com"
  ]
 app.add_middleware(
     CORSMiddleware,
